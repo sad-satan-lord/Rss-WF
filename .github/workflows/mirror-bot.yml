@@ -42,6 +42,7 @@ jobs:
         timeout-minutes: 340
         continue-on-error: true
         run: |
+          cd source || exit 1
           python3 rss.py
 
 
