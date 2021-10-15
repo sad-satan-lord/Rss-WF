@@ -10,7 +10,7 @@ env:
   # Change these values if you have forked it for your own works
   GitHubMail: ${{ secrets.GH_MAIL }}
   GitHubName: ${{ secrets.GH_USER }}
-  Branch: "main"
+  Branch: "master"
 
 jobs:
   build:
@@ -32,18 +32,19 @@ jobs:
         run: |
           git clone https://${{ secrets.GH_TOKEN }}@github.com/${{ secrets.MIRROR_REPOSLUG }} -b ${Branch} source
 
-      - name: Compile The RSS Feed Requirements
+
+      - name: Compile The Mirroring Docker Container
         run: |
           cd source || exit 1
-          pip3 install -r requirements.txt
+          docker container prune --force || true
+          docker build . --rm --force-rm --compress --no-cache=true --pull --file Dockerfile -t mirror-bot
+          docker image ls
 
-
-      - name: running rss feed
+      - name: running Docker
         timeout-minutes: 340
         continue-on-error: true
         run: |
-          cd source || exit 1
-          python3 rss.py
+          docker run --privileged --rm -i mirror-bot
 
 
       - name: Loop Workflow
